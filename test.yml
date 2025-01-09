@@ -1,41 +1,33 @@
+
+            
 ---
-- name: Install and update Apache on the client machine
+- name: Gather OS details and installed packages
   hosts: all
-  become: yes  # Use 'sudo' privileges
+  become: yes
   tasks:
-    - name: Update the apt cache (Debian/Ubuntu)
-      apt:
-        update_cache: yes
-      when: ansible_os_family == "Debian"
+    - name: Show OS details
+      ansible.builtin.command:
+        cmd: uname -a
+      register: os_details
 
-    - name: Update the yum cache (RHEL/CentOS)
-      yum:
-        name: "*"
-        state: latest
-      when: ansible_os_family == "RedHat"
+    - name: Print OS details
+      ansible.builtin.debug:
+        msg: "OS Details: {{ os_details.stdout }}"
 
-    - name: Install Apache (Debian/Ubuntu)
-      apt:
-        name: apache2
-        state: present
-      when: ansible_os_family == "Debian"
+    - name: Get Red Hat OS version
+      ansible.builtin.command:
+        cmd: cat /etc/redhat-release
+      register: os_version
 
-    - name: Install Apache (RHEL/CentOS)
-      yum:
-        name: httpd
-        state: present
-      when: ansible_os_family == "RedHat"
+    - name: Print Red Hat version
+      ansible.builtin.debug:
+        msg: "OS Version: {{ os_version.stdout }}"
 
-    - name: Start Apache service (Debian/Ubuntu)
-      service:
-        name: apache2
-        state: started
-        enabled: yes
-      when: ansible_os_family == "Debian"
+    - name: List installed packages
+      ansible.builtin.yum:
+        list: installed
+      register: installed_packages
 
-    - name: Start Apache service (RHEL/CentOS)
-      service:
-        name: httpd
-        state: started
-        enabled: yes
-      when: ansible_os_family == "RedHat"
+    - name: Print installed packages
+      ansible.builtin.debug:
+        msg: "Installed Packages: {{ installed_packages.results | map(attribute='name') | join(', ') }}"
