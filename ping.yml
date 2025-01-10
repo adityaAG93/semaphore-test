@@ -1,6 +1,6 @@
 ---
 - name: Ping target hosts
-  hosts: targets
+  hosts: dev-server
   gather_facts: false
   tasks:
     - name: Test connectivity to target host
