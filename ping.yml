@@ -2,6 +2,7 @@
 - name: Ping target hosts
   hosts: dev-server
   gather_facts: false
+  become: yes
   tasks:
     - name: Test connectivity to target host
       ansible.builtin.ping:
